@@ -1,0 +1,12 @@
+escape ``
+
+vbell off
+
+autodetach on
+
+startup_message off
+
+caption always "%3n %t%? @%u%?%? [%h]%?%=%c"
+hardstatus alwaysignore
+hardstatus alwayslastline "%Lw"
+

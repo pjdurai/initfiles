@@ -2,6 +2,9 @@
 
 ;;;;; Emacs ;;;;;;;;;;;;;;;;;;;;
 
+;; turn off VC mode (performance issue during opening and closing emacs)
+(setq vc-handled-backends nil)
+
 ;; start emacs server
 ;(server-start)
 

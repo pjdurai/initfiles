@@ -1,3 +1,5 @@
+(setq default-directory "~/" )
+
 (setq load-path (cons "~/site-lisp" load-path))
 
 ;;;;; Emacs ;;;;;;;;;;;;;;;;;;;;
@@ -5,8 +7,8 @@
 ;; turn off VC mode (performance issue during opening and closing emacs)
 (setq vc-handled-backends nil)
 
-;; start emacs server
-;(server-start)
+
+(setq tab-always-indent 'complete)
 
 ;;; Protocol Buffer Mode   ;;;;;
 
@@ -15,6 +17,17 @@
 ;; Printing ;;
 
 (setq printer-name "DOT4_001")
+
+
+;;;;; AutoInstall
+
+(require 'auto-install)
+
+;;;; Anything
+
+(add-to-list 'load-path "~/site-lisp/anything")
+(require 'anything-match-plugin)
+(require 'anything-config)
 
 ;;;; ParEdit
 (autoload 'paredit-mode "paredit"
@@ -38,13 +51,13 @@
 ;;; interfacing with ELPA, the package archive.
 ;;; Move this code earlier if you want to reference
 ;;; packages in your .emacs.
-(when
-    (load
-     (expand-file-name "~/.emacs.d/elpa/package.el"))
-  (package-initialize))
+;; (when
+;;     (load
+;;      (expand-file-name "~/.emacs.d/elpa/package.el"))
+;;   (package-initialize))
 
-(setq load-path (cons "~/.emacs.d/elpa" load-path))
-(load "package")
+;; (setq load-path (cons "~/.emacs.d/elpa" load-path))
+;; (load "package")
 
 (global-set-key [(C-wheel-up)] 'previous-buffer)
 (global-set-key [(C-wheel-down)] 'next-buffer)
@@ -127,12 +140,15 @@
 
 ;;;;;;;Org ;;;;;;;;;;;;;;;;
 
-;(setq load-path (cons "~/site-lisp/org-6.24/lisp" load-path))
+(setq load-path (cons "~/site-lisp/org-7.8.02/lisp" load-path))
+(setq  load-path  (cons  "~/site-lisp/org-7.8.02/contrib/lisp"  load-path))
+(require 'org-install)
 
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
+(global-set-key  "\C-cc"  'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
 
 (global-font-lock-mode 1)                     ; for all buffers
@@ -161,7 +177,7 @@
   (widen)
   (let ((today (format-time-string org-journal-date-format)))
     (beginning-of-buffer)
-    (unless (org-goto-local-search-forward-headings today nil t)
+    (unless (org-goto-local-search-headings today nil t)
       ((lambda () 
          (org-insert-heading)
          (insert today)
@@ -187,6 +203,32 @@
 (add-hook 'org-clock-in-hook '(lambda () 
       (if (not org-timer-current-timer) 
       (org-timer-set-timer '(16)))))
+
+
+;;;;;;;;;;;;;;;; c# ;;;;;;;;;;;;;;;;;;;;;;;;
+
+(autoload 'csharp-mode "csharp-mode" "Major mode for editing C# code." t)
+(setq auto-mode-alist
+      (append '(("\\.cs$" . csharp-mode)) auto-mode-alist))
+
+
+;; Optionally, define and register a mode-hook function. To do so, use
+;; something like this in your .emacs file:
+
+(defun my-csharp-mode-fn ()
+  "function that runs when csharp-mode is initialized for a buffer."
+  (turn-on-auto-revert-mode)
+  (setq indent-tabs-mode nil)
+  ;(require 'flymake)
+  ;(flymake-mode 1)
+  ;(require 'yasnippet)
+  ;(yas/minor-mode-on)
+  ;(require 'rfringe)
+  )
+
+(add-hook  'csharp-mode-hook 'my-csharp-mode-fn t)
+
+
 
 ;;;;;;; Erlang ;;;;;;;;;;;;;;;;;
 
@@ -297,17 +339,28 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; Clojure ;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (require 'clojure-mode)
-;; (setq auto-mode-alist
-;;       (cons '("\\.clj$" . clojure-mode)
-;;             auto-mode-alist))
+(add-to-list 'load-path "~/site-lisp/clojure-mode")
+(require 'clojure-mode)
+(setq auto-mode-alist
+      (cons '("\\.clj$" . clojure-mode)
+            auto-mode-alist))
 
+
+;; ;; swank-clojure
+;(add-to-list 'load-path "~/site-lisp/swank-clojure")
+
+;; (setq swank-clojure-jar-path "~/.clojure/clojure.jar"
+;;       swank-clojure-extra-classpaths (list
+;; 				      "~/site-lisp/swank-clojure/src/main/clojure"
+;; 				      "~/.clojure/clojure-contrib.jar"))
+
+;(require 'swank-clojure-autoload)
 
 ;; (add-to-list 'load-path "~/.emacs.d/elpa/slime-repl-20100404")
 
 
-;; (eval-after-load "slime" 
-;;   '(progn (slime-setup '(slime-repl))))
+ ;; (eval-after-load "slime" 
+;;    '(progn (slime-setup '(slime-repl))))
 
 ;; (add-to-list 'load-path "~/site-lisp/slime")
 ;; (require 'slime)
@@ -315,7 +368,28 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;; lisp  CCL ;;;;;;;;;;;;;;;;;;;;;;;;
+;(add-to-list 'load-path "~/site-lisp/slime")
+
+;; (eval-after-load "slime"
+;;   '(progn
+;;      (slime-setup '(slime-fancy
+;; 		    slime-fancy-inspector
+;; 		    slime-asdf
+;; 		    slime-indentation
+;; 		    slime-fontifying-fu))
+;; 					;(slime-autodoc-mode)
+;;      (setq slime-complete-symbol*-fancy t)
+;;      (setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol)
+;;      ))
+;; (setq inferior-lisp-program  "C:/tools/ccl-1.7/wx86cl.exe")
+
+;; (require 'slime)
+;; (slime-setup)
+
+
+;;;;;;;;;;;;;;;;;;;;;;; Lisp SBCL ;;;;;;;;;;;;;;;;;;;;;;;
 (add-to-list 'load-path "~/site-lisp/slime")
+
 (eval-after-load "slime"
   '(progn
      (slime-setup '(slime-fancy
@@ -327,17 +401,25 @@
      (setq slime-complete-symbol*-fancy t)
      (setq slime-complete-symbol-function 'slime-fuzzy-complete-symbol)
      ))
-;(require 'slime)
-(setq inferior-lisp-program  "C:/tools/ccl/wx86cl.exe")
+(setq inferior-lisp-program  "C:/tools/sbcl_1055/sbcl.exe")
 
 (require 'slime)
 (slime-setup)
 
 
+;;;; Scala ;;;;
+
+(add-to-list 'load-path "~/site-lisp/scala-emacs")
+(require 'scala-mode-auto)
+	 
+(add-hook 'scala-mode-hook
+	  '(lambda ()
+	     (scala-mode-feature-electric-mode)
+	     ))
 
 
 ;;;;;;;;;;;;;;;;;;; Git ;;;;;;;;;;;;;;;
-(setq load-path (cons "~/site-lisp/magit-0.8" load-path))
+(setq load-path (cons "~/site-lisp/magit-1.0.0" load-path))
 
 (require 'magit)
 (defun magit-escape-for-shell (str)
@@ -406,3 +488,12 @@
  )
 
 
+;; start emacs server
+(server-start)
+
+
+;;;;;;;;;;;;;;;;;;;  CL + J ;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;(defvar cl-user:*jre-home* "C:/Program Files/Java/jre6")
+;(defvar cl-user:*jvm-path* "C:/Program Files/Java/jre6/bin/client/jvm.dll")
+;(defvar cl-user:*jvm-options* '("-Djava.class.path=C:/libs/lisp-libs/cl+j-0.2/cl_j.jar"))
